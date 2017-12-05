@@ -35,10 +35,29 @@ def generate_paths(n):
 
     return paths
 
-def main(n):
+def walk(n, step, total):
+    if n == 0:
+        if step == 0:
+            total += 1
+        return total
+    return walk(n-1, step+1, total) + walk(n-1, step-1, total)
+
+def random_walk(n):
+    back_to_origin = walk(n, 0, 0)
+    prob = back_to_origin / float(2 ** n)
+    return back_to_origin, prob
+
+def brute_force(n):
     paths = generate_paths(n)
     back_to_origin = sum([1 for v in paths if v[-1] == 0])
     prob = back_to_origin / float(len(paths))
+    return back_to_origin, prob
+
+def main(n, c):
+    if c == 0:
+        back_to_origin, prob = random_walk(n)
+    elif c == 1:
+        back_to_origin, prob = brute_force(n)
 
     print("-==-" * 10)
     print("Number of solution that goes back to the origin:{}".format(\
@@ -48,8 +67,11 @@ def main(n):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--choice",
+                        type=int, default=0,
+                        help="0: recursion, 1:brute force")
     parser.add_argument("-m", "--moves",
                         type=int, default=4,
                         help="Number of moves")
     args = parser.parse_args()
-    main(args.moves)
+    main(args.moves, args.choice)
